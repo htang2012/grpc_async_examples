@@ -20,14 +20,15 @@ CXX = g++
 CPPFLAGS += `pkg-config --cflags protobuf grpc`
 CXXFLAGS += -std=c++14
 ifeq ($(SYSTEM),Darwin)
-LDFLAGS += -L/usr/local/lib `pkg-config --libs protobuf grpc++ grpc`\
+LDFLAGS += -L/usr/local/lib `pkg-config --libs grpc++ grpc`\
+           -pthread\
            -lgrpc++_reflection\
-           -ldl -lssl -lcrypto
+           -ldl -lssl -lcrypto -lprotobuf
 else
-LDFLAGS += -L/usr/local/lib `pkg-config --libs protobuf grpc++ grpc`\
-	   -L/usr/lib/x86_64-linux-gnu\
+LDFLAGS += -L/usr/local/lib `pkg-config --libs  grpc++ grpc`\
+           -pthread\
            -Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
-           -ldl -lssl -lcrypto -Wl,--unresolved-symbols=ignore-all
+	   -ldl -lssl -lcrypto -lprotobuf
 endif
 PROTOC = protoc
 GRPC_CPP_PLUGIN = grpc_cpp_plugin
@@ -38,6 +39,8 @@ PROTOS_PATH = .
 vpath %.proto $(PROTOS_PATH)
 
 all: system-check greeter_client greeter_server greeter_async_client greeter_async_client2 greeter_async_server async_streaming_server async_streaming_server_alarm greeter_streaming_client async_streaming_server_queue_to_back async_streaming_server_queue_to_front
+
+
 
 greeter_client: helloworld.pb.o helloworld.grpc.pb.o greeter_client.o
 	$(CXX) $^ $(LDFLAGS) -o $@
@@ -54,6 +57,7 @@ greeter_async_client2: helloworld.pb.o helloworld.grpc.pb.o greeter_async_client
 greeter_async_server: helloworld.pb.o helloworld.grpc.pb.o greeter_async_server.o
 	$(CXX) $^ $(LDFLAGS) -o $@
 
+
 async_streaming_server: hellostreamingworld.pb.o hellostreamingworld.grpc.pb.o async_streaming_server.o
 	$(CXX) $^ $(LDFLAGS) -o $@
 
@@ -69,6 +73,8 @@ async_streaming_server_queue_to_back: hellostreamingworld.pb.o hellostreamingwor
 async_streaming_server_queue_to_front: hellostreamingworld.pb.o hellostreamingworld.grpc.pb.o async_streaming_server_queue_to_front.o
 	$(CXX) $^ $(LDFLAGS) -o $@
 
+
+
 .PRECIOUS: %.grpc.pb.cc
 %.grpc.pb.cc: %.proto
 	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=. --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
@@ -79,6 +85,7 @@ async_streaming_server_queue_to_front: hellostreamingworld.pb.o hellostreamingwo
 
 clean:
 	rm -f *.o *.pb.cc *.pb.h greeter_client greeter_server greeter_async_client greeter_async_client2 greeter_async_server async_streaming_server async_streaming_server_alarm greeter_streaming_client async_streaming_server_queue_to_back async_streaming_server_queue_to_front
+
 
 
 # The following is to test your system and ensure a smoother experience.
