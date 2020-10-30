@@ -38,38 +38,6 @@ set(HELLOSTREAMINGWORLD_GRPC_PB_CPP_FILE "${GENERATED_PROTOBUF_PATH}/hellostream
 set(HELLOSTREAMINGWORLD_GRPC_PB_H_FILE "${GENERATED_PROTOBUF_PATH}/hellostreamingworld.grpc.pb.h")
 
 
-add_custom_command(
-    OUTPUT "${HELLOWORLD_PB_H_FILE}"
-           "${HELLOWORLD_PB_CPP_FILE}"
-           "${HELLOWORLD_GRPC_PB_H_FILE}"
-           "${HELLOWORLD_GRPC_PB_CPP_FILE}"
-    COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
-    ARGS "--proto_path=${PROTO_PATH}"
-         "--cpp_out=${GENERATED_PROTOBUF_PATH}"
-         "${HELLOWORLD_PROTO}"
-    COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
-    ARGS "--proto_path=${PROTO_PATH}"
-         "--grpc_out=${GENERATED_PROTOBUF_PATH}"
-         "--plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin"
-         "${HELLOWORLD_PROTO}"
-    )
-
-add_custom_command(
-    OUTPUT "${HELLOSTREAMINGWORLD_PB_H_FILE}"
-           "${HELLOSTREAMINGWORLD_PB_CPP_FILE}"
-           "${HELLOSTREAMINGWORLD_GRPC_PB_H_FILE}"
-           "${HELLOSTREAMINGWORLD_GRPC_PB_CPP_FILE}"
-    COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
-    ARGS "--proto_path=${PROTO_PATH}"
-         "--cpp_out=${GENERATED_PROTOBUF_PATH}"
-         "${HELLOSTREAMINGWORLD_PROTO}"
-    COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
-    ARGS "--proto_path=${PROTO_PATH}"
-         "--grpc_out=${GENERATED_PROTOBUF_PATH}"
-         "--plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin"
-         "${HELLOSTREAMINGWORLD_PROTO}"
-    )
-
 
 
 set(GENERATED_PROTOBUF_FILES ${HELLOWORLD_PB_H_FILE} ${HELLOWORLD_PB_CPP_FILE}
@@ -77,6 +45,36 @@ ${HELLOWORLD_GRPC_PB_H_FILE} ${HELLOWORLD_GRPC_PB_CPP_FILE})
 
 set(GENERATED_PROTOBUF_STREAMING_FILES ${HELLOSTREAMINGWORLD_PB_H_FILE} ${HELLOSTREAMINGWORLD_PB_CPP_FILE}
 ${HELLOSTREAMINGWORLD_GRPC_PB_H_FILE} ${HELLOSTREAMINGWORLD_GRPC_PB_CPP_FILE})
+
+add_custom_command(
+    OUTPUT  ${GENERATED_PROTOBUF_STREAMING_FILES}
+    COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
+    ARGS "--proto_path=${PROTO_PATH}"
+         "--cpp_out=${GENERATED_PROTOBUF_PATH}"
+         "${HELLOSTREAMINGWORLD_PROTO}"
+    COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
+    ARGS "--proto_path=${PROTO_PATH}"
+         "--grpc_out=${GENERATED_PROTOBUF_PATH}"
+         "--plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin"
+         "${HELLOSTREAMINGWORLD_PROTO}"
+    )
+
+add_custom_command(
+     OUTPUT  ${GENERATED_PROTOBUF_FILES}
+     COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
+     ARGS "--proto_path=${PROTO_PATH}"
+          "--cpp_out=${GENERATED_PROTOBUF_PATH}"
+          "${HELLOWORLD_PROTO}"
+     COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
+     ARGS "--proto_path=${PROTO_PATH}"
+          "--grpc_out=${GENERATED_PROTOBUF_PATH}"
+          "--plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin"
+          "${HELLOWORLD_PROTO}"
+     )
+ 
+ 
+
+
 
 include_directories(${GENERATED_PROTOBUF_PATH})
 foreach(target greeter_async_client greeter_async_server greeter_client greeter_server)
@@ -93,4 +91,7 @@ foreach(target greeter_streaming_client async_streaming_server_alarm
 endforeach()
 
 
+#macro(my_build)
+#    set(targets )
+#    cmake_parse_arguments(EXECUTE_BUILD ${GENERATED_EXECUTE_FILES} CONFIGURATION ${})
 
